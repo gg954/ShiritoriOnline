@@ -266,7 +266,8 @@ let app = new Vue({
 			console.log("GameStart");
 				
 			var db = firebase.database();
-		  
+			db.ref("/my/game/updatedAt").set(firebase.database.ServerValue.TIMESTAMP);
+			
 			/* 開始処理 */
 			//先行決め
 			let dummyList = ['red','blue'];
@@ -275,7 +276,7 @@ let app = new Vue({
 			var status = (turn == "red") ? "waitRed" : "waitBlue";
 			db.ref("/my/game/status").set(status);
 			
-			db.ref("/my/game/updatedAt").set(firebase.database.ServerValue.TIMESTAMP);
+			
 			
 			//ランダムなひらがな1文字を生成
 			let wordList = "あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよわ";
@@ -303,6 +304,14 @@ let app = new Vue({
 			//現在との差分時間
 			var nowtime = Date.now();
 			var diftime = Math.floor((nowtime - this.updatedAt)/1000); //[sec]
+			
+			console.log(60 - diftime + "sec後 timeout")
+			//60sを超えたら強制退出
+			if(this.status!='waitStart' && diftime>60){
+				console.log("timeout " + diftime + "sec")
+				this.exitRoom();
+			}
+			
 			//制限時間
 			this.settime = 10; //[sec]
 			if(this.settime > diftime){
@@ -316,12 +325,12 @@ let app = new Vue({
 		countdown: function(){
 			if(this.timer > 0){
 				this.timer = this.timer-0.01;
-				console.log("残り時間" + this.timer)
+				console.log("remain " + this.timer + "sec")
 				
 			}else{							
 				//タイマーストップ（timerobjをクリア）
 				clearInterval(this.timerobj);
-				console.log("timeout")
+				console.log("timeup!!")
 				
 				var status = (this.status == "waitRed") ? "BlueWin" : "RedWin";
 				var db = firebase.database();
