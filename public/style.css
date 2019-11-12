@@ -15,6 +15,7 @@ body {
   	box-shadow: none;
   }
 }
+
 #app {
 	background: white; 
 	max-width: 400px; 
@@ -28,7 +29,7 @@ body {
 	font-size: 30px; 
 	font-weight: 300; 
 	color: rgba(0,0,0,0.6); 
-	margin: 0 0 16px;
+	margin: 0 0 5px;
 }
 
 /* button areaのスタイル */
@@ -37,7 +38,7 @@ body {
 	width: auto;
 	position: relative;
 	display: flex;
-	padding: 30px 0px 15px;
+	padding: 5px 0px 15px;
 }
 
 #action-area button{
@@ -67,7 +68,7 @@ body {
 	height: auto;
 	width: 100%;
 	margin: 5px 2px 5px 4px;
-	
+	border:1px solid #545454;
 }
 
 #chat-area button {
@@ -81,35 +82,37 @@ body {
   	cursor:pointer;
 }
 
-#progress {
-	width: 390px;
-	height: 5px;
-	margin: 0px 4px 2px; 
-}
-
 /* チャットリストのスタイル */
-p{
-  padding: 0.25em 0.5em;/*上下 左右の余白*/
-  background: transparent;/*背景透明に*/	
+.chat-list div{
+  padding: 0.1em 0.5em;/*上下 左右の余白*/
+  background: transparent;/*背景透明に*/ 
+  margin-block-start: 0.5em;
+  margin-block-end: 0.5em;
 }
-
-.chatList_red{
+.chat-list .chatList_red{
   border-left: solid 6px #ff0080;/*左線*/
   border-bottom: solid 2px #ff0080;/*下線*/
 }
 
-.chatList_blue{
+.chat-list .chatList_blue{
   border-left: solid 6px #0080ff;/*左線*/
   border-bottom: solid 2px #0080ff;/*下線*/
 }
 
-.chatList_gray{
+.chat-list .chatList_gray{
   border-left: solid 6px #808080;/*左線*/
   border-bottom: solid 2px #808080;/*下線*/
 }
 
-/* 在席ボックスのスタイル */
+.chat-list #timestamp{
+  font-size:9pt;
+  text-align: right;
+  margin-block-start: 0em;
+  margin-block-end: 0em;
+}
 
+
+/* 在席ボックスのスタイル */
 table{
   text-align: center;
   width: 100%;
@@ -162,4 +165,20 @@ table #blueTeam th {
 	position: absolute;
 	right: 20px;
 	background: #ffffff;
+}
+
+
+/* プログレスバーのスタイル */
+#progress {
+	width: 100%;
+	height: 5px;
+	margin: 0px 4px 2px; 
+}
+
+@media (max-width: 500px) {
+  #progress { 
+    width: 80vw;
+    height: 5px;
+    margin: 0px 4px 2px; 
+	}
 }

@@ -6,114 +6,127 @@
     <link rel="stylesheet" href="style.css" type="text/css">
     <title>Online Shiritori</title>
 
-	<!-- The core Firebase JS SDK is always required and must be listed first -->
-	<script src="https://www.gstatic.com/firebasejs/7.2.2/firebase-app.js"></script>
-	<script src="https://www.gstatic.com/firebasejs/7.2.2/firebase-auth.js"></script>  
-	<script src="https://www.gstatic.com/firebasejs/7.2.2/firebase-database.js"></script>
+    <!-- The core Firebase JS SDK is always required and must be listed first -->
+    <script src="https://www.gstatic.com/firebasejs/7.2.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.2.2/firebase-auth.js"></script>  
+    <script src="https://www.gstatic.com/firebasejs/7.2.2/firebase-database.js"></script>
 	
-	<!-- QR生成ライブラリ -->    
+	<!-- QR生成ライブラリ -->
 	<script src="https://cdn.jsdelivr.net/npm/vue-qriously@1.1.1/dist/vue-qriously.min.js"></script>
 	
-	<script src="https://rawgit.com/kimmobrunfeldt/progressbar.js/master/dist/progressbar.js"></script>
-	<script src="https://rawgit.com/kimmobrunfeldt/progressbar.js/master/dist/progressbar.min.js"></script>
+	<!-- 日付時刻操作ライブラリ -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.js"></script>
   </head>
   
- <body>
+  <body>
   
- <div id='app'>
-  <h1>Online Shiritori</h1>
-  <div v-on:mouseover="qrshow=true" v-on:mouseleave="qrshow=false" align="right"><small>QR▼</small></div>
-  <div v-if="qrshow" id="qrcord">
-  	<qriously class="text-center" :value="qrurl" :size="120" v-if="qrshow" ></qriously>
-  </div>
+    <div id='app'>
+      <h1>Online Shiritori</h1>
+      <div v-on:mouseover="qrshow=true" v-on:mouseleave="qrshow=false" v-on:click="qrshow=false" align="right"><small>QR▼</small></div>
+      <div v-if="qrshow" id="qrcord" v-on:click="qrshow=false">
+        <qriously class="text-center" :value="qrurl" :size="120"></qriously>
+      </div>
   
-  	<div><small>
-	  <li>両ルームにプレイヤーがいるとGame Startできます。</li>
-	  <li>回答文字は、ひらがなのみです。</li>
-	</small></div> 
+      <div><font size=3px>
+        <li>両ルームにプレイヤーがいるとGame Start可能。</li>
+        <li>回答文字は、ひらがなのみ。</li>
+        <li>言葉の重複に対応。制限時間に対応。</li>
+      </font></div> <br>
 	
-	<table border="0" >
-	<tr>
-		<td>
-			<table id="redTeam" >
-			  <th @click="changeRoom('red')" width="24px"><span v-if="status=='waitRed'">A</span></th>
-			  <th @click="changeRoom('red')" width="100px"><span>Red</span></th>
-			  <td @click="changeRoom('red')">
-			  <span id="red">
-			  	<div v-if="!redID">Entry Room</div>
-			  	<div v-else-if="redID==userID" style="color:#ff0080">在席：あなた</div>
-			  	<div v-else style="background:#EEEEEE">在席：{{redID}}</div>
-			  </span></td>
-			</table>
-		</td>
-	</tr>
-	<tr>
-		<td>
-			<table id="blueTeam">
-			 <th @click="changeRoom('blue')" width="24px"><span v-if="status=='waitBlue'">A</span></th>
-			 <th @click="changeRoom('blue')" width="100px"><span>Blue</span></th>
-			 <td @click="changeRoom('blue')">
-			 	<span id="blue">
-			  		<div v-if="!blueID">Entry Room</div>
-			  		<div v-else-if="blueID==userID" style="color:#0080ff">在席：あなた</div>
-			  		<div v-else style="background:#EEEEEE">在席：{{blueID}}</div>
-			 	</span>
-			 </td>
-			</table>
-		</td>
-	</tr>
-	</table> 
+      <table border="0" >
+        <tr>
+          <td>
+	        <table id="redTeam" >
+	          <th @click="changeRoom('red')" width="24px"><span v-if="status=='waitRed'">A</span></th>
+		      <th @click="changeRoom('red')" width="100px"><span>Red</span></th>
+		      <td @click="changeRoom('red')">
+		      <span id="red">
+		        <div v-if="!redID">Entry Room</div>
+		        <div v-else-if="redID==userID" style="color:#ff0080">在席：あなた</div>
+		        <div v-else style="background:#EEEEEE">在席：{{redID}}</div>
+		      </span></td>
+	        </table>
+	      </td>
+        </tr>
+        <tr>
+	      <td>
+		    <table id="blueTeam">
+		      <th @click="changeRoom('blue')" width="24px"><span v-if="status=='waitBlue'">A</span></th>
+		      <th @click="changeRoom('blue')" width="100px"><span>Blue</span></th>
+		      <td @click="changeRoom('blue')">
+		      <span id="blue">
+		        <div v-if="!blueID">Entry Room</div>
+			    <div v-else-if="blueID==userID" style="color:#0080ff">在席：あなた</div>
+			    <div v-else style="background:#EEEEEE">在席：{{blueID}}</div>
+		      </span>
+		      </td>
+	        </table>
+	      </td>
+	    </tr>
+      </table> 
 
-	<div id="action-area">
-	  <button v-on:click="startGame">Game Start</button>　
-	  <button v-on:click="exitRoom">Game Close</button>
-	</div>
+      <div id="action-area">
+	    <button v-on:click="startGame">Game Start</button>　
+	    <button v-on:click="exitRoom">Game Close</button>
+      </div>
 
-    <span v-show="endWord!=''">
-      <p v-if="status=='waitRed'" class="chatList_red">
-        <strong> {{endWord}} </strong>で始まる言葉
-        <span v-if="redID==userID">：あなた</span>
-      </p>
-      <p v-else-if="status=='waitBlue'" class="chatList_blue">
-        <strong> {{endWord}} </strong>で始まる言葉
-        <span v-if="blueID==userID">：あなた</span>
-      </p>
-    </span>
+      <span v-show="endWord!=''" class="chat-list">
+        <div v-if="status=='waitRed'" class="chatList_red">
+          <strong> {{endWord}} </strong>で始まる言葉
+          <span v-if="redID==userID">：あなた</span>
+          <span v-else>：だれか</span>
+        </div>
+        <div v-else-if="status=='waitBlue'" class="chatList_blue">
+          <strong> {{endWord}} </strong>で始まる言葉
+          <span v-if="blueID==userID">：あなた</span>
+          <span v-else>：だれか</span>
+        </div>
+      </span>
+      <div v-if="status=='waitRed' || status=='waitBlue'">
+        <progress :value="timer" :max="settime" id="progress"></progress>
+      </div>
+      <div id="chat-area" v-if="status=='waitRed' || status=='waitBlue'" >
+        <input v-model="chatText" v-if="status=='waitRed' && redID==userID" v-on:keydown.enter="sendChat" type="text" id="chatText">
+        <input v-model="chatText" v-else-if="status=='waitBlue' && blueID==userID" v-on:keydown.enter="sendChat" type="text" id="chatText">
+        <input v-model="chatText" v-else v-on:keydown.enter="sendChat" type="text" id="chatText" style="background:#EEEEEE;">
+        <button v-on:click="sendChat">回答</button>
+      </div>
       
-    <div id="chat-area">
-      <input v-model="chatText" v-on:keydown.enter="sendChat" type="text" id="chatText">
-      <button v-on:click="sendChat">回答</button>
-    </div>
-    <progress :value="timer" :max="settime" id="progress"></progress>
-    <div>
-      <small>Status：</small>
-      <small v-if="status=='waitEntry'">参加者待ち</small>
-      <small v-else-if="status=='waitStart'">参加者が揃いました。ゲーム開始できます。</small>
-      <small v-else-if="status=='waitRed'">Red の回答待ちです。</small>
-      <small v-else-if="status=='waitBlue'">Blue の回答待ちです。</small>
-      <small v-else-if="status=='RedWin'">Red の勝ち！</small>
-      <small v-else-if="status=='BlueWin'">Blue の勝ち！</small>
-    </div>
-    <small>Message：{{message}}</small><br>
       
-			
-    <div v-for="item in sort_chatList_createdAt" >
-      <p v-if="item.team=='red'" class="chatList_red">
-        ID：{{ item.user }}　<strong>{{ item.text }}</strong>
-      </p>
-      <p v-else-if="item.team=='blue'" class="chatList_blue">
-        ID：{{ item.user }}　<strong>{{ item.text }}</strong>
-      </p>
-      <p v-else class="chatList_gray">
-        ID：{{ item.user }}　<strong>{{ item.text }}</strong>
-      </p>
-    </div>
+      
+      <div>
+        <small>Status：</small>
+        <small v-if="status=='waitEntry'">参加者待ち</small>
+        <small v-else-if="status=='waitStart'">参加者が揃いました。ゲーム開始できます。</small>
+        <small v-else-if="status=='waitRed'">Red の回答待ちです。</small>
+        <small v-else-if="status=='waitBlue'">Blue の回答待ちです。</small>
+        <small v-else-if="status=='RedWin'">Red の勝ち！</small>
+        <small v-else-if="status=='BlueWin'">Blue の勝ち！</small>
+      </div>
+      <small>Message：{{message}}</small><br>
+      
+      <div v-for="item in sort_chatList_createdAt" class="chat-list">
+        <div v-if="item.team=='red'" class="chatList_red">
+          <p id="timestamp">ID:{{ item.user }}  {{item.createdAt | moment}}</p>
+          <strong>{{ item.text }}</strong>
+        </div>
+        <div v-else-if="item.team=='blue'" class="chatList_blue">
+          <p id="timestamp">ID:{{ item.user }}  {{item.createdAt | moment}}</p>
+          <strong>{{ item.text }}</strong>
+        </div>
+        <div v-else class="chatList_gray">
+          <p id="timestamp">ID:{{ item.user }}  {{item.createdAt | moment}}</p>
+          <strong>{{ item.text }}</strong>
+        </div>
+      </div>
       
     </div>
+      
+    <!-- Vue.js を読み込む -->
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+    <script src="./shiri.js"></script>
     
-	<!-- Vue.js を読み込む -->
-	<script src="https://unpkg.com/vue/dist/vue.js"></script>
-	<script src="./shiri.js"></script>
+
 	
   </body>
 </html>
